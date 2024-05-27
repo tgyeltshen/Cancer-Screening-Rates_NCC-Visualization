@@ -1,0 +1,613 @@
+---
+title: TRENDS OF CANCER SCREENING RATES IN JAPAN, 2001 - 2022
+author: "Tshewang Gyeltshen, Hirokazu Tanaka"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: yes
+    toc_float:
+      collapsed: yes
+      smooth_scroll: no
+    number_sections: no
+    toc_depth: 3
+    df_print: paged
+    code_folding: hide
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+editor_options:
+  chunk_output_type: console
+  theme: flatly
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, results="asis",warning = FALSE, message = FALSE)
+rm(list = ls())
+setwd("D:/GSPH-ST-LUKES/NCC_Research_fellow")
+```
+
+#Load packages
+
+```{r Loading library, echo=FALSE}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(ggpubr)
+library(cowplot)
+```
+
+# Male - Age-Standardized Cancer Screening Rates
+```{r male-vsln}
+# Age-standardized cancer screening rates for men
+# Data for Stomach cancer
+survyear_stomach <- c(2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022)
+scr_rate_stomach <- c(31.7, 27.8, 33.7, 36.6, 49.4, 48.4, 49.7, 48.5)
+cancer_type_stomach <- rep("Stomach", length(survyear_stomach))
+
+# Data for Lung cancer
+survyear_lung <- c(2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022)
+scr_rate_lung <- c(19.0, 16.8, 26.6, 26.5, 51.8, 53.3, 55.4, 54.5)
+cancer_type_lung <- rep("Lung", length(survyear_lung))
+
+# Data for Colorectal cancer
+survyear_colorectal <- c(2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022)
+scr_rate_colorectal <- c(22.7, 22.1, 27.9, 28.2, 45.4, 46.9, 49.5, 50.1)
+cancer_type_colorectal <- rep("Colorectal", length(survyear_colorectal) )
+
+# Create dataframes for each cancer type
+df_stomach <- data.frame(survyear=survyear_stomach, scr_rate=scr_rate_stomach,  cancer_type=cancer_type_stomach)
+df_lung <- data.frame(survyear=survyear_lung, scr_rate=scr_rate_lung, cancer_type=cancer_type_lung)
+df_colorectal <- data.frame(survyear=survyear_colorectal, scr_rate=scr_rate_colorectal, cancer_type=cancer_type_colorectal)
+
+# Combine the dataframes
+df_combined <- rbind(df_stomach, df_lung, df_colorectal)
+
+# Plotting the data
+plot1 <- ggplot(df_combined, aes(x = survyear, y = scr_rate, color = cancer_type, group = cancer_type)) +
+  geom_line(size = 1) +
+  geom_point(shape = 16, size = 3, stroke = 2) +
+  geom_text(data = subset(df_combined, !(survyear == 2019 & cancer_type %in% c("Stomach", "Colorectal"))),
+            aes(label = ifelse(!is.na(scr_rate), as.character(scr_rate), "")),
+            vjust = -0.95, size = 3, show.legend = FALSE) +
+  geom_text(data = subset(df_combined, survyear == 2019 & cancer_type == "Stomach"),
+            aes(label = ifelse(!is.na(scr_rate), as.character(scr_rate), "")),
+            vjust = -0.95, size = 3, show.legend = FALSE, nudge_y = 0.5) +
+  geom_text(data = subset(df_combined, survyear == 2019 & cancer_type == "Colorectal"),
+            aes(label = ifelse(!is.na(scr_rate), as.character(scr_rate), "")),
+            vjust = -0.95, size = 3, show.legend = FALSE, nudge_y = -1.5) +
+  labs(title = "",
+       x = "Survey Year",
+       y = "Cancer Screening Rate (%)",
+       color = "Cancer Type") +
+  theme_minimal() +
+  scale_color_manual(values = c("Stomach" = "#922B21", "Lung" = "#1F618D", "Colorectal" = "#58D68D")) +
+  scale_x_continuous(breaks = unique(df_combined$survyear), labels = unique(df_combined$survyear)) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 18, face = "bold"),
+    axis.title = element_text(size = 16),
+    axis.text = element_text(size = 14),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    panel.grid.major = element_line(color = "grey85", size = 0.5),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(color = "grey50", fill = NA, size = 0.8),
+    plot.background = element_rect(fill = "white"),
+    legend.background = element_rect(fill = "white", color = "grey80", size = 0.5, linetype = "solid"),
+    legend.position = c(0.76, 0.18),
+    legend.direction = "horizontal",
+    legend.box.background = element_rect(color = "grey80", size = 0.5),
+    legend.box.margin = margin(t = 5, r = 5, b = 5, l = 5, unit = "pt")
+  )
+plot1
+
+```
+
+# Females - Age-Standardized Cancer Screening Rates
+```{r female-vsln}
+# Age-standardized cancer screening rates for women
+# Data for Stomach cancer
+survyear_stomach <- c(2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022)
+scr_rate_stomach <- c(26.0, 23.3, 26.8, 28.4, 28.4, 37.0, 38.2, 37.2)
+cancer_type_stomach <- rep("Stomach", length(survyear_stomach))
+
+# Data for Lung cancer
+survyear_lung <- c(2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022)
+scr_rate_lung <- c(15.7, 14.0, 22.9, 23.1, 41.2, 43.5, 47.1, 47.2)
+cancer_type_lung <- rep("Lung", length(survyear_lung))
+
+# Data for Colorectal cancer
+survyear_colorectal <- c(2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022)
+scr_rate_colorectal <- c(19.8, 19.4, 23.7, 24.0, 37.7, 40.0, 42.1, 43.5)
+cancer_type_colorectal <- rep("Colorectal", length(survyear_colorectal))
+
+# Data for Breast cancer
+survyear_breast <- c(2010, 2013, 2016, 2019, 2022)
+scr_rate_breast <- c(39.1, 43.5, 46.5, 48.7, 48.2)
+cancer_type_breast <- rep("Breast", length(survyear_breast))
+
+# Data for Cervical cancer
+survyear_cervix <- c(2010, 2013, 2016, 2019, 2022)
+scr_rate_cervix <- c(37.1, 41.6, 43.2, 44.2, 43.8)
+cancer_type_cervix <- rep("Cervical", length(survyear_cervix))
+
+# Create the dataframe
+df_combined_women <- data.frame(
+  survyear = c(survyear_stomach, survyear_lung, survyear_colorectal, survyear_breast, survyear_cervix),
+  scr_rate = c(scr_rate_stomach, scr_rate_lung, scr_rate_colorectal, scr_rate_breast, scr_rate_cervix),
+  cancer_type = c(cancer_type_stomach, cancer_type_lung, cancer_type_colorectal, cancer_type_breast, cancer_type_cervix)
+)
+
+# Plotting the data
+plot2 <- ggplot(df_combined_women, aes(x = survyear, y = scr_rate, color = cancer_type, group = cancer_type)) +
+  geom_line(size = 1) +
+  geom_point(shape = 16, size = 3, stroke = 2) +
+  geom_text(data = subset(df_combined_women, !(survyear == 2022 & cancer_type %in% c("Stomach", "Colorectal", "Breast")) &
+                            !(survyear == 2016 & cancer_type == "Cervical") &
+                            !(cancer_type == "Lung" & survyear %in% c(2007, 2010, 2013, 2022))),
+            aes(label = ifelse(!is.na(scr_rate), as.character(scr_rate), "")),
+            vjust = -0.95, size = 3, show.legend = FALSE) +
+  geom_text(data = subset(df_combined_women, survyear == 2022 & cancer_type == "Stomach"),
+            aes(label = ifelse(!is.na(scr_rate), as.character(scr_rate), "")),
+            vjust = -0.95, size = 3, show.legend = FALSE, nudge_y = 0.00) +
+  geom_text(data = subset(df_combined_women, survyear == 2022 & cancer_type == "Colorectal"),
+            aes(label = ifelse(!is.na(scr_rate), as.character(scr_rate), "")),
+            vjust = -0.95, size = 3, show.legend = FALSE, nudge_y = -1.3) +
+  geom_text(data = subset(df_combined_women, survyear == 2022 & cancer_type == "Breast"),
+            aes(label = ifelse(!is.na(scr_rate), as.character(scr_rate), "")),
+            vjust = -0.95, size = 3, show.legend = FALSE, nudge_y = 0.5) +
+  geom_text(data = subset(df_combined_women, survyear == 2016 & cancer_type == "Cervical"),
+            aes(label = ifelse(!is.na(scr_rate), as.character(scr_rate), "")),
+            vjust = -0.95, size = 3, show.legend = FALSE, nudge_y = -1.3) +
+  geom_text(data = subset(df_combined_women, survyear == 2013 & cancer_type == "Lung"),
+            aes(label = ifelse(!is.na(scr_rate), as.character(scr_rate), "")),
+            vjust = 1.95, size = 3, show.legend = FALSE, nudge_x = 0.3) +
+  geom_text(data = subset(df_combined_women, survyear == 2007 & cancer_type == "Lung"),
+            aes(label = ifelse(!is.na(scr_rate), as.character(scr_rate), "")),
+            vjust = 1.95, size = 3, show.legend = FALSE, nudge_x = 0.3) +
+  geom_text(data = subset(df_combined_women, survyear == 2010 & cancer_type == "Lung"),
+            aes(label = ifelse(!is.na(scr_rate), as.character(scr_rate), "")),
+            vjust = 1.95, size = 3, show.legend = FALSE, nudge_x = 0.3) +
+  geom_text(data = subset(df_combined_women, survyear == 2022 & cancer_type == "Lung"),
+            aes(label = ifelse(!is.na(scr_rate), as.character(scr_rate), "")),
+            vjust = 1.95, size = 3, show.legend = FALSE, nudge_y = -0.1) +
+  labs(title = "",
+       x = "Survey Year",
+       y = "Cancer Screening Rate (%)",
+       color = "Cancer Type") +
+  theme_minimal() +
+  scale_color_manual(values = c("Stomach" = "#922B21", "Lung" = "#1F618D", "Colorectal" = "#58D68D", "Breast" = "#f4b41a", "Cervical" = "#8E44AD")) +
+  scale_x_continuous(breaks = unique(df_combined_women$survyear), labels = unique(df_combined_women$survyear)) +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 18, face = "bold"),
+    axis.title = element_text(size = 16),
+    axis.text = element_text(size = 14),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    panel.grid.major = element_line(color = "grey85", size = 0.5),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(color = "grey50", fill = NA, size = 0.8),
+    plot.background = element_rect(fill = "white"),
+    legend.background = element_rect(fill = "white", color = "grey80", size = 0.5, linetype = "solid"),
+    legend.position = c(0.715, 0.08),
+    legend.direction = "horizontal",
+    legend.box.background = element_rect(color = "grey80", size = 0.5),
+    legend.box.margin = margin(t = 5, r = 5, b = 5, l = 5, unit = "pt")
+  )
+plot2
+```
+
+# Both Sexes - Age Stratified 
+```{r combined}
+
+# Arrange the two plots side by side
+combined_plot <- ggarrange(plot2, plot1,
+                           ncol = 2, nrow = 1,
+                           widths = c(1, 1),  # Adjust the widths of the plots if needed
+                           labels = c("", ""),  # Remove the labels
+                           common.legend = TRUE,
+                           legend = "bottom")
+
+# Add custom labels for Female and Male plots
+combined_plot <- ggdraw(combined_plot) +
+  draw_label("Female", x = 0.25, y = 0.97, size = 12, fontface = "bold") +
+  draw_label("Male", x = 0.75, y = 0.97, size = 12, fontface = "bold")
+
+# Add title and adjust theme settings
+combined_plot <- ggdraw() +
+  draw_plot(combined_plot, 0, 0, 1, 1) +
+  draw_label("Age-Standardized Cancer Screening Rates for Males and Females in Japan 2001-2022",
+             x = 0.5, y = 1, hjust = 0.5, vjust = 1, size = 16, fontface = "bold") +
+  theme(plot.margin = margin(t = 20, b = 20))
+combined_plot
+
+```
+
+#Edu-level Males
+```{r cancer types}
+# Data for Stomach cancer in men
+survyear_stomach_men <- c(2010, 2013, 2016, 2019, 2022)
+scr_rate_stomach_edu_low <- c(20.7, 28.5, 28.4, 28.7, 28.3)
+scr_rate_stomach_edu_mid <- c(34.7, 46.2, 44.9, 45.8, 44.1)
+scr_rate_stomach_edu_high <-c(46.9, 59.6, 58.8, 59.4, 58.2)
+cancer_type_stomach_men <- rep("Stomach", length(survyear_stomach_men))
+
+# Data for Lung cancer in men
+survyear_lung_men <- c(2010, 2013, 2016, 2019, 2022)
+scr_rate_lung_edu_low <- c(16.2, 33.5, 36.8, 37.9, 35.8)
+scr_rate_lung_edu_mid <- c(25.4, 49.8, 51.2, 53.1, 51.9)
+scr_rate_lung_edu_high <-c(34.0, 60.2, 62.0, 63.5, 62.9)
+cancer_type_lung_men <- rep("Lung", length(survyear_lung_men))
+
+# Data for Colorectal cancer in men
+survyear_colorectal_men <- c(2010, 2013, 2016, 2019, 2022)
+scr_rate_colorectal_edu_low <- c(17.2, 27.1, 28.9, 30.2, 30.5)
+scr_rate_colorectal_edu_mid <- c(26.9, 42.6, 44.1, 46.5, 46.8)
+scr_rate_colorectal_edu_high <-c(36.3, 54.7, 56.4, 58.6, 58.9)
+cancer_type_colorectal_men <- rep("Colorectal", length(survyear_colorectal_men))
+
+
+# Plot by Cancer types for men
+# Create dataframes for each cancer type
+df_stomach_men <- data.frame(
+  survyear = survyear_stomach_men,
+  scr_rate_edu_low = scr_rate_stomach_edu_low,
+  scr_rate_edu_mid = scr_rate_stomach_edu_mid,
+  scr_rate_edu_high = scr_rate_stomach_edu_high,
+  cancer_type = cancer_type_stomach_men
+)
+
+df_lung_men <- data.frame(
+  survyear = survyear_lung_men,
+  scr_rate_edu_low = scr_rate_lung_edu_low,
+  scr_rate_edu_mid = scr_rate_lung_edu_mid,
+  scr_rate_edu_high = scr_rate_lung_edu_high,
+  cancer_type = cancer_type_lung_men
+)
+
+df_colorectal_men <- data.frame(
+  survyear = survyear_colorectal_men,
+  scr_rate_edu_low = scr_rate_colorectal_edu_low,
+  scr_rate_edu_mid = scr_rate_colorectal_edu_mid,
+  scr_rate_edu_high = scr_rate_colorectal_edu_high,
+  cancer_type = cancer_type_colorectal_men
+)
+
+#Plot 
+# Combine the dataframes
+df_men <- bind_rows(df_stomach_men, df_lung_men, df_colorectal_men)
+
+# Convert the data to long format
+df_men_long <- df_men %>%
+  tidyr::pivot_longer(
+    cols = starts_with("scr_rate"),
+    names_to = "education_level",
+    values_to = "screening_rate"
+  ) %>%
+  mutate(education_level = case_when(
+    education_level == "scr_rate_edu_low" ~ "Low",
+    education_level == "scr_rate_edu_mid" ~ "Middle",
+    education_level == "scr_rate_edu_high" ~ "High"
+  ))
+
+```
+
+##plot-Edu-males
+```{r edu_males}
+#By Educational Levels
+df_men_long$education_level <- factor(df_men_long$education_level, levels = c("High", "Middle", "Low"))
+# Create the plot
+ggplot(df_men_long, aes(x = survyear, y = screening_rate, color = cancer_type, group = cancer_type)) +
+  geom_line(size = 1) +
+  geom_point(size = 2, shape = 16, fill = "white", stroke = 2) +
+  geom_text(aes(label = ifelse(!is.na(screening_rate), as.character(screening_rate), "")), vjust = -0.6, hjust = 0.7, size = 3, show.legend = FALSE) +
+  facet_wrap(~ education_level, ncol = 3) +
+  labs(
+    title = "Trends in Age-Standardized Cancer Screening Rates by Educational Level for Men",
+    x = "Survey Year",
+    y = "Cancer Screening Rate (%)",
+    color = "Cancer Type"
+  ) +
+  scale_color_manual(values = c("Stomach" = "#922B21", "Lung" = "#1F618D", "Colorectal" = "#58D68D")) +
+  scale_x_continuous(breaks = unique(df_men_long$survyear), labels = unique(df_men_long$survyear)) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 16),
+    axis.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    strip.text = element_text(size = 14, face = "bold"),
+    panel.grid.major = element_line(color = "grey90", size = 0.5),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(color = "grey50", fill = NA, size = 0.8),
+    plot.background = element_rect(fill = "white"),
+    legend.background = element_rect(fill = "white", color = "grey80", size = 0.5, linetype = "solid"),
+    legend.position = "bottom",
+    legend.direction = "horizontal",
+    legend.box.background = element_rect(color = "grey80", size = 0.5),
+    legend.box.margin = margin(t = 5, r = 5, b = 5, l = 5, unit = "pt")
+  )
+```
+
+## free-scale
+```{r, freescale-edumale}
+#By Educational Levels
+df_men_long$education_level <- factor(df_men_long$education_level, levels = c("High", "Middle", "Low"))
+# Create the plot
+ggplot(df_men_long, aes(x = survyear, y = screening_rate, color = cancer_type, group = cancer_type)) +
+  geom_line(size = 1) +
+  geom_point(size = 2, shape = 16, fill = "white", stroke = 2) +
+  geom_text(aes(label = ifelse(!is.na(screening_rate), as.character(screening_rate), "")), vjust = -0.6, hjust = 0.7, size = 3, show.legend = FALSE) +
+  facet_wrap(~ education_level, ncol = 3, scales = "free_y") +
+  labs(
+    title = "Trends in Age-Standardized Cancer Screening Rates by Educational Level for Men",
+    x = "Survey Year",
+    y = "Cancer Screening Rate (%)",
+    color = "Cancer Type"
+  ) +
+  scale_color_manual(values = c("Stomach" = "#922B21", "Lung" = "#1F618D", "Colorectal" = "#58D68D")) +
+  scale_x_continuous(breaks = unique(df_men_long$survyear), labels = unique(df_men_long$survyear)) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 16),
+    axis.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    strip.text = element_text(size = 14, face = "bold"),
+    panel.grid.major = element_line(color = "grey90", size = 0.5),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(color = "grey50", fill = NA, size = 0.8),
+    plot.background = element_rect(fill = "white"),
+    legend.background = element_rect(fill = "white", color = "grey80", size = 0.5, linetype = "solid"),
+    legend.position = "bottom",
+    legend.direction = "horizontal",
+    legend.box.background = element_rect(color = "grey80", size = 0.5),
+    legend.box.margin = margin(t = 5, r = 5, b = 5, l = 5, unit = "pt")
+  )
+
+```
+
+##edu-level-color aes
+```{r}
+ggplot(df_men_long, aes(x = survyear, y = screening_rate, color = education_level, group = education_level)) +
+  geom_line(size = 1) +
+  geom_point(size = 3, shape = 16, fill = "white", stroke = 2) +
+  geom_text(aes(label = ifelse(!is.na(screening_rate), as.character(screening_rate), "")), vjust = 2, size = 3, show.legend = FALSE)+
+  facet_wrap(~ cancer_type, ncol = 1, scales = "free_y") +
+  labs(
+    title = "Trends in Age-Standardized Cancer Screening Rates by Educational Level for Men",
+    x = "Survey Year",
+    y = "Cancer Screening Rate (%)",
+    color = "Educational Level"
+  ) +
+  scale_color_manual(values = c("Low" = "#808000", "Middle" = "#008080", "High" = "#FF5733")) +
+  scale_x_continuous(breaks = unique(df_men_long$survyear), labels = unique(df_men_long$survyear)) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 16),
+    axis.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    strip.text = element_text(size = 10, face = "bold"),
+    panel.grid.major = element_line(color = "grey90", size = 0.5),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(color = "grey50", fill = NA, size = 0.8),
+    plot.background = element_rect(fill = "white"),
+    legend.background = element_rect(fill = "white", color = "grey80", size = 0.5, linetype = "solid"),
+    legend.position = "bottom",
+    legend.box = "horizontal"
+  )
+
+```
+
+
+#Edu-level Females
+```{r}
+# Age-standardized cancer screening rates for women
+# Data for Stomach cancer in women
+survyear_stomach_women <- c(2010, 2013, 2016, 2019, 2022)
+scr_rate_stomach_women_edu_low <- c(18.4, 24.5, 24.1, 24.2, 20.2)
+scr_rate_stomach_women_edu_mid <- c(28.1, 35.4, 35.8, 35.8, 34.3)
+scr_rate_stomach_women_edu_high <- c(35.1, 43.2, 42.8, 44.3, 43.2)
+cancer_type_stomach_women <- c("Stomach", "Stomach", "Stomach", "Stomach", "Stomach")
+
+# Data for Lung cancer in women
+survyear_lung_women <- c(2010, 2013, 2016, 2019, 2022)
+scr_rate_lung_women_edu_low <- c(15.3, 27.9, 29.2, 32.5, 27.8)
+scr_rate_lung_women_edu_mid <- c(23.2, 40.6, 43.2, 45.7, 46.1)
+scr_rate_lung_women_edu_high <- c(28.6, 46.3, 48.2, 52.6, 52.3)
+cancer_type_lung_women <- c("Lung", "Lung", "Lung", "Lung", "Lung")
+
+# Data for Colorectal cancer in women
+survyear_colorectal_women <- c(2010, 2013, 2016, 2019, 2022)
+scr_rate_colorectal_women_edu_low <- c(16.5, 25.1, 25.9, 27.1, 23.3)
+scr_rate_colorectal_women_edu_mid <- c(23.9, 36.4, 38.9, 40.0, 41.2)
+scr_rate_colorectal_women_edu_high <- c(30.0, 43.9, 46.4, 48.6, 49.7)
+cancer_type_colorectal_women <- rep("Colorectal", length(survyear_colorectal_women))
+
+# Data for Breast cancer
+survyear_breast <- c(2010, 2013, 2016, 2019, 2022)
+scr_rate_breast_edu_low <- c(24.1, 26.8, 28.4, 28.4, 25.3)
+scr_rate_breast_edu_mid <- c(38.5, 41.8, 44.7, 45.7, 44.7)
+scr_rate_breast_edu_high <- c(48.9, 52.9, 54.3, 57.2, 56.2)
+cancer_type_breast <- c("Breast", "Breast", "Breast", "Breast", "Breast")
+
+# Data for Cervical cancer
+survyear_cervix <- c(2010, 2013, 2016, 2019, 2022)
+scr_rate_cervix_edu_low <- c(25.1, 29.3, 29.6, 29.4, 28.6)
+scr_rate_cervix_edu_mid <- c(36.3, 39.8, 41.7, 41.6, 40.7)
+scr_rate_cervix_edu_high <- c(43.7, 48.3, 48.6, 50.4, 49.2)
+cancer_type_cervix <- rep("Cervical", length(survyear_cervix))
+
+# Create dataframes for each cancer type
+df_stomach_women <- data.frame(
+  survyear = survyear_stomach_women,
+  scr_rate_edu_low = scr_rate_stomach_women_edu_low,
+  scr_rate_edu_mid = scr_rate_stomach_women_edu_mid,
+  scr_rate_edu_high = scr_rate_stomach_women_edu_high,
+  cancer_type = cancer_type_stomach_women
+)
+
+df_lung_women <- data.frame(
+  survyear = survyear_lung_women,
+  scr_rate_edu_low = scr_rate_lung_women_edu_low,
+  scr_rate_edu_mid = scr_rate_lung_women_edu_mid,
+  scr_rate_edu_high = scr_rate_lung_women_edu_high,
+  cancer_type = cancer_type_lung_women
+)
+
+df_colorectal_women <- data.frame(
+  survyear = survyear_colorectal_women,
+  scr_rate_edu_low = scr_rate_colorectal_women_edu_low,
+  scr_rate_edu_mid = scr_rate_colorectal_women_edu_mid,
+  scr_rate_edu_high = scr_rate_colorectal_women_edu_high,
+  cancer_type = cancer_type_colorectal_women
+)
+
+df_breast_women <- data.frame(
+  survyear = survyear_breast,
+  scr_rate_edu_low = scr_rate_breast_edu_low,
+  scr_rate_edu_mid = scr_rate_breast_edu_mid,
+  scr_rate_edu_high = scr_rate_breast_edu_high,
+  cancer_type = cancer_type_breast
+)
+
+df_cervix_women <- data.frame(
+  survyear = survyear_cervix,
+  scr_rate_edu_low = scr_rate_cervix_edu_low,
+  scr_rate_edu_mid = scr_rate_cervix_edu_mid,
+  scr_rate_edu_high = scr_rate_cervix_edu_high,
+  cancer_type = cancer_type_cervix
+)
+
+# Combine the dataframes for men and women
+df_combined_women <- rbind(df_stomach_women, df_lung_women, df_colorectal_women, df_breast_women, df_cervix_women)
+
+# Convert the data to long format
+df_women_long <- df_combined_women %>%
+  tidyr::pivot_longer(
+    cols = starts_with("scr_rate"),
+    names_to = "education_level",
+    values_to = "screening_rate"
+  ) %>%
+  mutate(education_level = case_when(
+    education_level == "scr_rate_edu_low" ~ "Low",
+    education_level == "scr_rate_edu_mid" ~ "Middle",
+    education_level == "scr_rate_edu_high" ~ "High"
+  ))
+
+```
+
+##plot-edu-females
+```{r}
+# Plot with color aesthetic applied to cancer types## Edu-level
+df_women_long$education_level <- factor(df_women_long$education_level, levels = c("High", "Middle", "Low"))
+ggplot(df_women_long, aes(x = survyear, y = screening_rate, color = cancer_type, group = cancer_type)) +
+  geom_line(size = 1) +
+  geom_point(size = 3, shape = 16, fill = "white", stroke = 2) +
+  geom_text(aes(label = ifelse(!is.na(screening_rate), as.character(screening_rate), "")), vjust = 2, size = 3, show.legend = FALSE) +
+  facet_wrap(~ education_level, ncol = 3) +
+  labs(
+    title = "Trends in Age-Standardized Cancer Screening Rates by Educational Level for Women",
+    x = "Survey Year",
+    y = "Cancer Screening Rate (%)",
+    color = "Cancer Type"
+  ) +
+  scale_color_manual(values = c("Stomach" = "#922B21", "Lung" = "#1F618D", "Colorectal" = "#58D68D", "Breast" = "#f4b41a", "Cervical" = "#8E44AD")) +
+  scale_x_continuous(breaks = unique(df_women_long$survyear), labels = unique(df_women_long$survyear)) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 16),
+    axis.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    strip.text = element_text(size = 14, face = "bold"),
+    panel.grid.major = element_line(color = "grey90", size = 0.5),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(color = "grey50", fill = NA, size = 0.8),
+    plot.background = element_rect(fill = "white"),
+    legend.background = element_rect(fill = "white", color = "grey80", size = 0.5, linetype = "solid"),
+    legend.position = "bottom",
+    legend.direction = "horizontal",
+    legend.box.background = element_rect(color = "grey80", size = 0.5),
+    legend.box.margin = margin(t = 5, r = 5, b = 5, l = 5, unit = "pt")
+  )
+```
+
+##free scales
+```{r}
+# Plot with color aesthetic applied to cancer types## Edu-level
+df_women_long$education_level <- factor(df_women_long$education_level, levels = c("High", "Middle", "Low"))
+ggplot(df_women_long, aes(x = survyear, y = screening_rate, color = cancer_type, group = cancer_type)) +
+  geom_line(size = 1) +
+  geom_point(size = 3, shape = 16, fill = "white", stroke = 2) +
+  geom_text(aes(label = ifelse(!is.na(screening_rate), as.character(screening_rate), "")), vjust = 2, size = 3, show.legend = FALSE) +
+  facet_wrap(~ education_level, ncol = 3, scales = "free_y") +
+  labs(
+    title = "Trends in Age-Standardized Cancer Screening Rates by Educational Level for Women",
+    x = "Survey Year",
+    y = "Cancer Screening Rate (%)",
+    color = "Cancer Type"
+  ) +
+  scale_color_manual(values = c("Stomach" = "#922B21", "Lung" = "#1F618D", "Colorectal" = "#58D68D", "Breast" = "#f4b41a", "Cervical" = "#8E44AD")) +
+  scale_x_continuous(breaks = unique(df_women_long$survyear), labels = unique(df_women_long$survyear)) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 16),
+    axis.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    strip.text = element_text(size = 14, face = "bold"),
+    panel.grid.major = element_line(color = "grey90", size = 0.5),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(color = "grey50", fill = NA, size = 0.8),
+    plot.background = element_rect(fill = "white"),
+    legend.background = element_rect(fill = "white", color = "grey80", size = 0.5, linetype = "solid"),
+    legend.position = "bottom",
+    legend.direction = "horizontal",
+    legend.box.background = element_rect(color = "grey80", size = 0.5),
+    legend.box.margin = margin(t = 5, r = 5, b = 5, l = 5, unit = "pt")
+  )
+```
+
+##edu-level-color aes
+
+```{r}
+ggplot(df_women_long, aes(x = survyear, y = screening_rate, color = education_level, group = education_level)) +
+  geom_line(size = 1) +  
+  geom_point(size = 3, shape = 16, fill = "white", stroke = 2) +
+  geom_text(aes(label = ifelse(!is.na(screening_rate), as.character(screening_rate), "")), vjust = 2, size = 3, show.legend = FALSE) +
+  facet_wrap(~ cancer_type, ncol = 2) +
+  labs(
+    title = "Trends in Age-Standardized Cancer Screening Rates by Educational Level for Women",
+    x = "Survey Year",
+    y = "Cancer Screening Rate (%)",
+    color = "Educational Level"
+  ) +
+  scale_color_manual(values = c("Low" = "#808000", "Middle" = "#008080", "High" = "#FF5733")) +
+  scale_x_continuous(breaks = unique(df_women_long$survyear), labels = unique(df_women_long$survyear)) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 16),
+    axis.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 12),
+    strip.text = element_text(size = 10, face = "bold"),
+    panel.grid.major = element_line(color = "grey90", size = 0.5),
+    panel.grid.minor = element_blank(),
+    panel.border = element_rect(color = "grey50", fill = NA, size = 0.8),
+    plot.background = element_rect(fill = "white"),
+    legend.background = element_rect(fill = "white", color = "grey80", size = 0.5, linetype = "solid"),
+    legend.position = "inside",
+    legend.position.inside = c(.80, .16),
+    legend.direction = "horizontal",
+    legend.box.background = element_rect(color = "grey80", size = 0.5),
+    legend.box.margin = margin(t = 5, r = 5, b = 5, l = 5, unit = "pt")
+  )
+```
+
